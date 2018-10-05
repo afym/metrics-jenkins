@@ -1,0 +1,38 @@
+node {
+    def sonarProperties =
+        """
+sonar.projectKey=application
+sonar.projectName=Application
+sonar.projectVersion=1.0
+sonar.sources=src
+sonar.sourceEncoding=UTF-8
+    """
+
+    def environment = "master"
+
+    stage('pull') {
+        git url: 'https://github.com/afym/metrics-jenkins-app.git'
+        git branch : environment
+        git changelog : true
+    }
+
+    stage('install') {
+        sh 'mvn clean install -DskipTests'
+    }
+
+    stage('test') {
+        sh 'mvn clean test'
+    }
+
+    stage('package') {
+        sh 'mvn clean package -DskipTests'
+    }
+
+    stage('analysis') {
+        sh "echo '${sonarProperties}' >> sonar-project.properties"
+        //writeFile file: "sonar-project.properties", text: "${sonarProperties}"
+        withSonarQubeEnv('sonar-server') {
+           sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar'
+        }
+    }
+}

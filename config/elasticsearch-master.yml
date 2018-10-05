@@ -1,0 +1,6 @@
+# https://www.elastic.co/guide/en/elasticsearch/reference/6.3/important-settings.html
+cluster.name: elastisearch
+node.name: "es-node-1"
+node.master: true
+network.host: 0.0.0.0
+discovery.zen.ping.unicast.hosts: ["elasticsearch2"]
